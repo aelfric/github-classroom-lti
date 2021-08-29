@@ -13,6 +13,7 @@ import org.jboss.resteasy.annotations.Form;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -46,7 +47,7 @@ public class LinkingResource {
   }
 
   @POST
-  @Path("/recordRepoUrl")
+  @Path("/go")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces(MediaType.TEXT_HTML)
   public Response recordRepoUrl(@FormParam("url") String url, @FormParam("redirect_url") String redirectUrl) {
@@ -64,15 +65,21 @@ public class LinkingResource {
   @Path("/link")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces(MediaType.TEXT_HTML)
+  @Transactional
   public TemplateInstance linkToAssignment(
       @FormParam("assignment_id") String assignmentId,
       @FormParam("invitation_url") String invitationUrl
   ) {
-    final AssignmentLink link = new AssignmentLink(assignmentId, invitationUrl);
+    AssignmentLink link = entityManager.find(AssignmentLink.class, assignmentId);
+    if(link == null) {
+      link = new AssignmentLink(assignmentId, invitationUrl);
+    } else {
+      link.invitationLink = invitationUrl;
+    }
     entityManager.persist(link);
     return setup
         .data("resourceId", assignmentId)
-        .data("invitationUrl", invitationUrl);
+        .data("inviteUrl", invitationUrl);
   }
 
   @POST
@@ -88,7 +95,7 @@ public class LinkingResource {
       AssignmentLink link = entityManager.find(AssignmentLink.class, body.assignmentId);
       return setup
           .data("resourceId", body.assignmentId)
-          .data("inviteUrl", link.invitationLink);
+          .data("inviteUrl", link == null ? "" : link.invitationLink);
     } else {
       throw new ForbiddenException("This view is only for instructors");
     }
@@ -108,7 +115,7 @@ public class LinkingResource {
     if (body.roles.contains("Learner")) {
       return github
           .data("redirect", body.extContentReturnUrl)
-          .data("inviteUrl", link.invitationLink);
+          .data("inviteUrl", link == null ? "" : link.invitationLink);
     } else {
       throw new ForbiddenException("This view is only for students");
     }
@@ -119,7 +126,8 @@ public class LinkingResource {
     try {
       final LtiVerificationResult verify = ltiVerifier.verify(request, secret);
       if (!verify.getSuccess()) {
-        throw new UnauthorizedException();
+        System.err.println(verify.getMessage());
+        throw new UnauthorizedException(verify.getMessage());
       }
     } catch (LtiVerificationException e) {
       throw new BadRequestException(e);

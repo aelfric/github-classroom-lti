@@ -1,10 +1,13 @@
 <html>
-<a href="https://classroom.github.com/a/4xeqDeHU" target="_blank" rel="noopener noreferrer">Go to GitHub</a>
-
-<p>Current URL: {resourceId}</p>
+<p>Current URL:
+    {#if inviteUrl ne ""}
+    {inviteUrl}
+    {#else}
+    Not Linked
+    {/if}</p>
 <form method="post" action="/hello/recordResourceLink">
-    <p><label>Invite URL: <input type="text" name="url"></label></p>
-    <input type="hidden" name="resourceId" value="{resourceId}">
+    <p><label>Invite URL: <input type="text" name="url" placeholder="{inviteUrl}"></label></p>
+    <input type="hidden" name="assignment_id" value="{resourceId}">
     <button type="submit">Submit</button>
 </form>
 </html>

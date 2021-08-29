@@ -2,6 +2,7 @@ package com.frankriccobono;
 
 import org.hibernate.annotations.NaturalId;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -9,8 +10,10 @@ import javax.persistence.Id;
 public class AssignmentLink {
   @Id
   @NaturalId
+  @Column(name = "assignment_id")
   public String assignmentId;
 
+  @Column(name = "invitation_link")
   public String invitationLink;
 
   protected AssignmentLink(){
