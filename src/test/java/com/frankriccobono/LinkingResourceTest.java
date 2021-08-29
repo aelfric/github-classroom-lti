@@ -43,13 +43,13 @@ public class LinkingResourceTest {
         ),
         "stevens",
         "stevens",
-        "http://localhost:8081/lti/instructor/launch",
+        "http://localhost:8081/lti/teacher/launch",
         "POST");
 
     given()
         .when()
         .formParams(signedParameters)
-        .post("/lti/instructor/launch")
+        .post("/lti/teacher/launch")
         .then()
         .body(containsString("newId"))
         .body(containsString("Not Linked"))
@@ -110,13 +110,13 @@ public class LinkingResourceTest {
         ),
         "stevens",
         "stevens",
-        "http://localhost:8081/lti/instructor/launch",
+        "http://localhost:8081/lti/teacher/launch",
         "POST");
 
     given()
         .when()
         .formParams(signedParameters)
-        .post("/lti/instructor/launch")
+        .post("/lti/teacher/launch")
         .then()
         .body(containsString("https://github.com/abcd"))
         .statusCode(200);

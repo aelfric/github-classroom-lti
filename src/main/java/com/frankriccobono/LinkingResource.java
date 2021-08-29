@@ -83,7 +83,7 @@ public class LinkingResource {
   }
 
   @POST
-  @Path("/instructor/launch")
+  @Path("/teacher/launch")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces(MediaType.TEXT_HTML)
   public TemplateInstance launchLtiForInstructor(
@@ -97,7 +97,7 @@ public class LinkingResource {
           .data("resourceId", body.assignmentId)
           .data("inviteUrl", link == null ? "" : link.invitationLink);
     } else {
-      throw new ForbiddenException("This view is only for instructors");
+      throw new ForbiddenException("This view is only for teachers");
     }
   }
 

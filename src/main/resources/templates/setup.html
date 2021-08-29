@@ -5,8 +5,8 @@
     {#else}
     Not Linked
     {/if}</p>
-<form method="post" action="/hello/recordResourceLink">
-    <p><label>Invite URL: <input type="text" name="url" placeholder="{inviteUrl}"></label></p>
+<form method="post" action="/lti/link">
+    <p><label>Invite URL: <input type="text" name="invitation_url" placeholder="{inviteUrl}"></label></p>
     <input type="hidden" name="assignment_id" value="{resourceId}">
     <button type="submit">Submit</button>
 </form>
