@@ -8,7 +8,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
 @QuarkusTest
-public class ExampleResourceTest {
+public class LinkingResourceTest {
 
   @Test
   public void testHelloEndpoint() {
@@ -18,4 +18,13 @@ public class ExampleResourceTest {
         .statusCode(200)
         .body(is("Hello RESTEasy"));
   }
+
+//  @Test
+//  public void testEmptyInstructorView(){
+//    given()
+//        .when()
+//        .post("/lti/instructor/launch")
+//        .then()
+//        .statusCode(200);
+//  }
 }
