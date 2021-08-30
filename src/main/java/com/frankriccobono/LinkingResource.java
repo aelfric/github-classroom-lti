@@ -3,11 +3,13 @@ package com.frankriccobono;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
 import io.quarkus.security.UnauthorizedException;
+import net.oauth.server.OAuthServlet;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.imsglobal.lti.launch.LtiOauthVerifier;
 import org.imsglobal.lti.launch.LtiVerificationException;
 import org.imsglobal.lti.launch.LtiVerificationResult;
 import org.imsglobal.lti.launch.LtiVerifier;
+import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.Form;
 
 import javax.inject.Inject;
@@ -25,6 +27,8 @@ import java.nio.charset.StandardCharsets;
 
 @Path("/lti")
 public class LinkingResource {
+  private static final Logger LOG = Logger.getLogger(LinkingResource.class);
+
 
   @SuppressWarnings("CdiInjectionPointsInspection")
   @Inject
@@ -126,7 +130,7 @@ public class LinkingResource {
     try {
       final LtiVerificationResult verify = ltiVerifier.verify(request, secret);
       if (!verify.getSuccess()) {
-        System.err.println(verify.getMessage());
+        LOG.warn("Invalid OAuth " + verify.getMessage() + " for " + OAuthServlet.getRequestURL(request));
         throw new UnauthorizedException(verify.getMessage());
       }
     } catch (LtiVerificationException e) {
