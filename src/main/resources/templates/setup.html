@@ -1,4 +1,6 @@
 <html>
+<link rel="stylesheet" href="/style.css" />
+<p><strong>Link This Assignment to Github</strong></p>
 <p>Current URL:
     {#if inviteUrl ne ""}
     {inviteUrl}
@@ -8,6 +10,6 @@
 <form method="post" action="/lti/link">
     <p><label>Invite URL: <input type="text" name="invitation_url" placeholder="{inviteUrl}"></label></p>
     <input type="hidden" name="assignment_id" value="{resourceId}">
-    <button type="submit">Submit</button>
+    <button class="btn btn-primary" type="submit">Submit</button>
 </form>
 </html>

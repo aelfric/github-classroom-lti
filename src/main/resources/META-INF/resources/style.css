@@ -1,0 +1,49 @@
+html {
+    --color-btn-primary-bg: #2da44e;
+    font-family: sans;
+}
+
+.btn {
+    transition: .2s cubic-bezier(.3,0,.5,1);
+    transition-property: color,background-color,border-color;
+}
+
+.btn svg {
+    height: 1em;
+    width: 1em;
+    position: relative;
+    top: .125em;
+}
+
+a.btn {
+    text-decoration: none;
+    color: inherit;
+}
+
+.btn {
+    background-color: #f6f8fa;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 1px solid;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    padding: 5px 16px;
+    position: relative;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background-color: var(--color-btn-primary-bg);
+    border-color: rgba(27, 31, 36, 0.15);
+    color: #fff;
+}
