@@ -28,4 +28,7 @@ public class LtiLaunchParams {
   @FormParam("custom_canvas_assignment_id")
   public String assignmentId;
 
+  boolean hasRole(String learner) {
+    return roles.contains(learner);
+  }
 }

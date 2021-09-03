@@ -15,6 +15,7 @@ import org.jboss.resteasy.annotations.Form;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -28,7 +29,8 @@ import java.nio.charset.StandardCharsets;
 @Path("/lti")
 public class LinkingResource {
   private static final Logger LOG = Logger.getLogger(LinkingResource.class);
-
+  private static final String INSTRUCTOR = "Instructor";
+  private static final String LEARNER = "Learner";
 
   @SuppressWarnings("CdiInjectionPointsInspection")
   @Inject
@@ -72,10 +74,16 @@ public class LinkingResource {
   @Transactional
   public TemplateInstance linkToAssignment(
       @FormParam("assignment_id") String assignmentId,
-      @FormParam("invitation_url") String invitationUrl
+      @FormParam("invitation_url") String invitationUrl,
+      @Context HttpServletRequest request
   ) {
+    final HttpSession session = request.getSession();
+    if (!INSTRUCTOR.equals(session.getAttribute("role"))) {
+      throw new ForbiddenException("Must be an instructor to update link");
+    }
+
     AssignmentLink link = entityManager.find(AssignmentLink.class, assignmentId);
-    if(link == null) {
+    if (link == null) {
       link = new AssignmentLink(assignmentId, invitationUrl);
     } else {
       link.invitationLink = invitationUrl;
@@ -91,14 +99,16 @@ public class LinkingResource {
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces(MediaType.TEXT_HTML)
   public TemplateInstance launchLtiForInstructor(
-      @Form LtiLaunchParams body,
+      @Form LtiLaunchParams ltiParams,
       @Context HttpServletRequest request
   ) {
     validateOauth(request);
-    if (body.roles.contains("Instructor")) {
-      AssignmentLink link = entityManager.find(AssignmentLink.class, body.assignmentId);
+    if (ltiParams.hasRole(INSTRUCTOR)) {
+      final HttpSession session = request.getSession();
+      session.setAttribute("role", INSTRUCTOR);
+      AssignmentLink link = entityManager.find(AssignmentLink.class, ltiParams.assignmentId);
       return setup
-          .data("resourceId", body.assignmentId)
+          .data("resourceId", ltiParams.assignmentId)
           .data("inviteUrl", link == null ? "" : link.invitationLink);
     } else {
       throw new ForbiddenException("This view is only for teachers");
@@ -110,15 +120,15 @@ public class LinkingResource {
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces(MediaType.TEXT_HTML)
   public TemplateInstance launchLtiForStudent(
-      @Form LtiLaunchParams body,
+      @Form LtiLaunchParams ltiParams,
       @Context HttpServletRequest request
   ) {
     validateOauth(request);
-    AssignmentLink link = entityManager.find(AssignmentLink.class, body.assignmentId);
+    AssignmentLink link = entityManager.find(AssignmentLink.class, ltiParams.assignmentId);
 
-    if (body.roles.contains("Learner")) {
+    if (ltiParams.hasRole(LEARNER)) {
       return github
-          .data("redirect", body.extContentReturnUrl)
+          .data("redirect", ltiParams.extContentReturnUrl)
           .data("inviteUrl", link == null ? "" : link.invitationLink);
     } else {
       throw new ForbiddenException("This view is only for students");

@@ -1,21 +1,13 @@
 package com.frankriccobono;
 
-import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.http.ContentType;
-import net.oauth.OAuthAccessor;
-import net.oauth.OAuthMessage;
-import oauth.signpost.signature.OAuthMessageSigner;
-import org.imsglobal.lti.launch.*;
+import io.restassured.filter.session.SessionFilter;
+import org.imsglobal.lti.launch.LtiOauthSigner;
+import org.imsglobal.lti.launch.LtiSigner;
+import org.imsglobal.lti.launch.LtiSigningException;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.transaction.*;
-import java.io.IOException;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -35,16 +27,10 @@ public class LinkingResourceTest {
 
   @Test
   public void testEmptyInstructorView() throws LtiSigningException {
-    LtiSigner ltiSigner = new LtiOauthSigner();
-    Map<String, String> signedParameters = ltiSigner.signParameters(
-        Map.of(
-            "roles","Instructor",
-            "custom_canvas_assignment_id","newId"
-        ),
-        "stevens",
-        "stevens",
-        "http://localhost:8081/lti/teacher/launch",
-        "POST");
+    Map<String, String> signedParameters = signedLtiParams(
+        "Instructor",
+        "newId",
+        "http://localhost:8081/lti/teacher/launch");
 
     given()
         .when()
@@ -58,16 +44,10 @@ public class LinkingResourceTest {
 
   @Test
   public void testEmptyStudentView() throws LtiSigningException {
-    LtiSigner ltiSigner = new LtiOauthSigner();
-    Map<String, String> signedParameters = ltiSigner.signParameters(
-        Map.of(
-            "roles","Learner",
-            "custom_canvas_assignment_id","someId"
-        ),
-        "stevens",
-        "stevens",
-        "http://localhost:8081/lti/student/launch",
-        "POST");
+    Map<String, String> signedParameters = signedLtiParams(
+        "Learner",
+        "someId",
+        "http://localhost:8081/lti/student/launch");
 
     given()
         .when()
@@ -80,16 +60,10 @@ public class LinkingResourceTest {
 
   @Test
   public void testAlreadyStudentView() throws LtiSigningException {
-    LtiSigner ltiSigner = new LtiOauthSigner();
-    Map<String, String> signedParameters = ltiSigner.signParameters(
-        Map.of(
-            "roles","Learner",
-            "custom_canvas_assignment_id","someId"
-        ),
-        "stevens",
-        "stevens",
-        "http://localhost:8081/lti/student/launch",
-        "POST");
+    Map<String, String> signedParameters = signedLtiParams(
+        "Learner",
+        "someId",
+        "http://localhost:8081/lti/student/launch");
 
     given()
         .when()
@@ -102,16 +76,10 @@ public class LinkingResourceTest {
 
   @Test
   public void testAlreadyInstructorView() throws LtiSigningException {
-    LtiSigner ltiSigner = new LtiOauthSigner();
-    Map<String, String> signedParameters = ltiSigner.signParameters(
-        Map.of(
-            "roles","Instructor",
-            "custom_canvas_assignment_id","someId"
-        ),
-        "stevens",
-        "stevens",
-        "http://localhost:8081/lti/teacher/launch",
-        "POST");
+    Map<String, String> signedParameters = signedLtiParams(
+        "Instructor",
+        "someId",
+        "http://localhost:8081/lti/teacher/launch");
 
     given()
         .when()
@@ -123,9 +91,28 @@ public class LinkingResourceTest {
   }
 
   @Test
-  void canLinkToNewAssignment() {
+  void canLinkToNewAssignment() throws LtiSigningException {
+    LtiSigner ltiSigner = new LtiOauthSigner();
+    SessionFilter sessionFilter = new SessionFilter();
+    Map<String, String> signedParameters = ltiSigner.signParameters(
+        Map.of(
+            "roles", "Instructor",
+            "custom_canvas_assignment_id", "someId"
+        ),
+        "stevens",
+        "stevens",
+        "http://localhost:8081/lti/teacher/launch",
+        "POST");
+
     given()
         .when()
+        .filter(sessionFilter)
+        .formParams(signedParameters)
+        .post("/lti/teacher/launch");
+
+    given()
+        .when()
+        .filter(sessionFilter)
         .formParam("assignment_id", "newId")
         .formParam("invitation_url", "https://github.com/xyz")
         .post("/lti/link")
@@ -135,9 +122,22 @@ public class LinkingResourceTest {
   }
 
   @Test
-  void canLinkToExistingAssignment() {
+  void canLinkToExistingAssignment() throws LtiSigningException {
+    SessionFilter sessionFilter = new SessionFilter();
+
+    Map<String, String> signedParameters = signedLtiParams(
+        "Instructor",
+        "someId",
+        "http://localhost:8081/lti/teacher/launch");
+
+    given()
+        .filter(sessionFilter)
+        .when()
+        .formParams(signedParameters)
+        .post("/lti/teacher/launch");
     given()
         .when()
+        .filter(sessionFilter)
         .formParam("assignment_id", "someId2")
         .formParam("invitation_url", "https://github.com/xyz")
         .post("/lti/link")
@@ -159,4 +159,18 @@ public class LinkingResourceTest {
         .statusCode(307)
         .header("location", containsString("github"));
   }
+
+  private Map<String, String> signedLtiParams(String role, String assignmentId, String url) throws LtiSigningException {
+    LtiSigner ltiSigner = new LtiOauthSigner();
+    return ltiSigner.signParameters(
+        Map.of(
+            "roles", role,
+            "custom_canvas_assignment_id", assignmentId
+        ),
+        "stevens",
+        "stevens",
+        url,
+        "POST");
+  }
+
 }
