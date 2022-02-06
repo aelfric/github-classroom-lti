@@ -57,8 +57,16 @@ public class LinkingResource {
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces(MediaType.TEXT_HTML)
   public Response recordRepoUrl(@FormParam("url") String url, @FormParam("redirect_url") String redirectUrl) {
-    final String encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8);
     try {
+      // Classroom will automatically create a pull request for instructor feedback.  This will
+      // construct that link from student's repo URL
+      final URI feedbackUrl = new URI(url + "/")
+          .resolve("pull/1");
+
+      final String encodedUrl = URLEncoder.encode(
+          feedbackUrl.toString(),
+          StandardCharsets.UTF_8
+      );
       return Response.temporaryRedirect(
           new URI(redirectUrl + "?return_type=url&url=" + encodedUrl)
       ).build();

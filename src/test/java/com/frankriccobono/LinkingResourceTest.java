@@ -151,7 +151,7 @@ public class LinkingResourceTest {
     given()
         .when()
         .formParam("url", "https://canvas.instructure.com")
-        .formParam("redirect_url", "https://github.com/xyz")
+        .formParam("redirect_url", "https://github.com/xyz/00-assignment-abd")
         .redirects()
         .follow(false)
         .post("/lti/go")

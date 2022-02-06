@@ -1,6 +1,6 @@
 html {
     --color-btn-primary-bg: #2da44e;
-    font-family: sans;
+    font-family: system-ui, sans-serif;
 }
 
 .btn {
@@ -46,4 +46,18 @@ a.btn {
     background-color: var(--color-btn-primary-bg);
     border-color: rgba(27, 31, 36, 0.15);
     color: #fff;
+}
+
+input {
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+    transition: border linear .2s,box-shadow linear .2s;
+    padding: 8px;
+    font-size: 14px;
+    line-height: 20px;
+    border-radius: 3px;
+    vertical-align: middle;
+    box-sizing: border-box;
 }
