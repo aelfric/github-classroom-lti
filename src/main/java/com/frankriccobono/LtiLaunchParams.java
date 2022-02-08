@@ -28,7 +28,20 @@ public class LtiLaunchParams {
   @FormParam("custom_canvas_assignment_id")
   public String assignmentId;
 
-  boolean hasRole(String learner) {
-    return roles.contains(learner);
+  boolean hasRole(String role) {
+    return roles.contains(role);
+  }
+
+  @Override
+  public String toString() {
+    return "LtiLaunchParams{" +
+        "contextId='" + contextId + '\'' +
+        ", contextLabel='" + contextLabel + '\'' +
+        ", contextTitle='" + contextTitle + '\'' +
+        ", roles='" + roles + '\'' +
+        ", userId='" + userId + '\'' +
+        ", extContentReturnUrl='" + extContentReturnUrl + '\'' +
+        ", assignmentId='" + assignmentId + '\'' +
+        '}';
   }
 }

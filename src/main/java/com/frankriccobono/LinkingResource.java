@@ -111,6 +111,7 @@ public class LinkingResource {
       @Context HttpServletRequest request
   ) {
     validateOauth(request);
+    LOG.info("Teacher Login " + ltiParams);
     if (ltiParams.hasRole(INSTRUCTOR)) {
       final HttpSession session = request.getSession();
       session.setAttribute("role", INSTRUCTOR);
@@ -132,6 +133,7 @@ public class LinkingResource {
       @Context HttpServletRequest request
   ) {
     validateOauth(request);
+    LOG.info("Student Login " + ltiParams);
     AssignmentLink link = entityManager.find(AssignmentLink.class, ltiParams.assignmentId);
 
     if (ltiParams.hasRole(LEARNER)) {
