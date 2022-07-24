@@ -32,11 +32,9 @@ public class LinkingResource {
   private static final String INSTRUCTOR = "Instructor";
   private static final String LEARNER = "Learner";
 
-  @SuppressWarnings("CdiInjectionPointsInspection")
   @Inject
   Template github;
 
-  @SuppressWarnings("CdiInjectionPointsInspection")
   @Inject
   Template setup;
 
@@ -58,13 +56,8 @@ public class LinkingResource {
   @Produces(MediaType.TEXT_HTML)
   public Response recordRepoUrl(@FormParam("url") String url, @FormParam("redirect_url") String redirectUrl) {
     try {
-      // Classroom will automatically create a pull request for instructor feedback.  This will
-      // construct that link from student's repo URL
-      final URI feedbackUrl = new URI(url + "/")
-          .resolve("pull/1");
-
       final String encodedUrl = URLEncoder.encode(
-          feedbackUrl.toString(),
+          GithubUrl.parseUrl(url).toFeedbackPr(),
           StandardCharsets.UTF_8
       );
       return Response.temporaryRedirect(
