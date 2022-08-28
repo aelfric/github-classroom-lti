@@ -10,22 +10,22 @@
     http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p3.xsd">
     <blti:title>Frank's Github LTI Test</blti:title>
     <blti:description>Frank's Github LTI Test</blti:description>
-    <blti:launch_url>https://ee552.frankriccobono.com/lti/teacher/launch</blti:launch_url>
+    <blti:launch_url>https://ghlti.riccobono.dev/lti/teacher/launch</blti:launch_url>
     <blti:extensions platform="canvas.instructure.com">
-        <lticm:property name="tool_id">LTI Frank Test (2)</lticm:property>
-        <lticm:property name="domain">https://ee552.frankriccobono.com</lticm:property>
+        <lticm:property name="tool_id">LTI Github Classroom</lticm:property>
+        <lticm:property name="domain">https://ghlti.riccobono.dev</lticm:property>
         <lticm:options name="custom_fields">
             <lticm:property name="canvas_course_name">$Canvas.course.name</lticm:property>
             <lticm:property name="canvas_assignment_id">$Canvas.assignment.id</lticm:property>
         </lticm:options>
         <lticm:property name="privacy_level">public</lticm:property>
         <lticm:options name="assignment_edit">
-            <lticm:property name="url">https://ee552.frankriccobono.com/lti/teacher/launch</lticm:property>>
+            <lticm:property name="url">https://ghlti.riccobono.dev/lti/teacher/launch</lticm:property>>
             <lticm:property name="enabled">true</lticm:property>
             <lticm:property name="visibility">admins</lticm:property>
         </lticm:options>
         <lticm:options name="homework_submission">
-            <lticm:property name="url">https://ee552.frankriccobono.com/lti/student/launch</lticm:property>
+            <lticm:property name="url">https://ghlti.riccobono.dev/lti/student/launch</lticm:property>
             <lticm:property name="enabled">true</lticm:property>
             <lticm:property name="visibility">members</lticm:property>
         </lticm:options>
